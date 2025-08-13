@@ -3,8 +3,8 @@ using TMPro;
 
 public class InteractionPromptUI : MonoBehaviour
 {
-    public PlayerInteractor interactor;   
-    public TextMeshProUGUI label;         
+    public PlayerInteractor interactor;
+    public TextMeshProUGUI label;
 
     void LateUpdate()
     {
@@ -12,7 +12,8 @@ public class InteractionPromptUI : MonoBehaviour
 
         string prompt = null;
         var cam = Camera.main;
-        if (cam && Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, interactor.interactDistance, interactor.interactMask))
+        if (cam && Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit,
+                interactor.interactDistance, interactor.interactMask))
         {
             var i = hit.collider.GetComponentInParent<IInteractable>();
             if (i != null && i.CanInteract(interactor))
@@ -27,6 +28,8 @@ public class InteractionPromptUI : MonoBehaviour
 
         label.gameObject.SetActive(!string.IsNullOrEmpty(prompt));
         if (!string.IsNullOrEmpty(prompt))
-            label.text = $"[E] {prompt}";
+        {
+            label.text = "[E]" + prompt;
+        }
     }
 }

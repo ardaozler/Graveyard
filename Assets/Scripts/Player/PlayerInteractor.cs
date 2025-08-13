@@ -113,11 +113,16 @@ public class PlayerInteractor : MonoBehaviour
             }
         }
 
-        if (_lastHighlight != targetHighlight)
+
+        if (_lastHighlight && _lastHighlight != targetHighlight)
+            _lastHighlight.SetHighlighted(false, this);
+
+        if (targetHighlight)
         {
-            if (_lastHighlight) _lastHighlight.SetHighlighted(false);
-            if (targetHighlight) targetHighlight.SetHighlighted(true);
-            _lastHighlight = targetHighlight;
+            bool can = _lookInteractable == null || _lookInteractable.CanInteract(this);
+            targetHighlight.SetHighlighted(can, this);
         }
+
+        _lastHighlight = targetHighlight;
     }
 }
