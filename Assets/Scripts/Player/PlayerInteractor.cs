@@ -7,6 +7,7 @@ public class PlayerInteractor : MonoBehaviour
     public LayerMask interactMask = ~0;
 
     [Header("Input Settings")] public KeyCode interactKey = KeyCode.E;
+    public KeyCode dropKey = KeyCode.Q;
 
     public KeyCode throwKey = KeyCode.Mouse1;
 
@@ -35,22 +36,20 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (Input.GetKeyDown(interactKey))
         {
-            // If looking at an interactable, use it first
+            // If looking at an interactable, use it
             if (_lookInteractable != null && _lookInteractable.CanInteract(this))
             {
                 _lookInteractable.Interact(this);
-                return;
             }
 
-            // If not, toggle pickup/drop
             if (_held == null)
             {
                 TryPickup();
             }
-            else
-            {
-                DropHeld();
-            }
+        }
+        else if (Input.GetKeyDown(dropKey))
+        {
+            DropHeld();
         }
     }
 
@@ -74,11 +73,8 @@ public class PlayerInteractor : MonoBehaviour
         if (Physics.Raycast(_cam.transform.position, _cam.transform.forward, out RaycastHit hit, interactDistance,
                 interactMask, QueryTriggerInteraction.Ignore))
         {
-            // Only pick up if there isn't a higher-priority interactable
-            var interactable = hit.collider.GetComponentInParent<IInteractable>();
-            if (interactable == null)
+            if (hit.collider.TryGetComponent(out Pickupable pickup))
             {
-                var pickup = hit.collider.GetComponentInParent<Pickupable>();
                 if (pickup != null)
                 {
                     pickup.Pickup(holdPoint);

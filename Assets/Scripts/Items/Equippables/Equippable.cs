@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AddComponentMenu("Interaction/Equippable (SO Tool)")]
-public class Equippable : MonoBehaviour, IInteractable
+public class Equippable : Pickupable, IInteractable
 {
     public ToolDefinition tool; 
 
