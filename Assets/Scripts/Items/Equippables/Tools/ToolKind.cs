@@ -1,1 +1,0 @@
-public enum ToolKind { None = 0, Lantern = 1, Shovel = 2 }
