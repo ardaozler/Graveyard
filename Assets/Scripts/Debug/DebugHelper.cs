@@ -18,4 +18,17 @@ public class DebugHelper : MonoBehaviour
 
         Debug.Log(text);
     }
+
+    public void DropPositionBy(float offset)
+    {
+        Transform transform = GetComponent<Transform>();
+        if (transform == null)
+        {
+            Debug.LogWarning("No Transform component found.");
+            return;
+        }
+
+        Vector3 newPosition = transform.position + Vector3.down * offset;
+        transform.position = newPosition;
+    }
 }

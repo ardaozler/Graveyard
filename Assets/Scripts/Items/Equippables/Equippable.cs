@@ -1,27 +1,27 @@
 using UnityEngine;
 
-[AddComponentMenu("Interaction/Equippable (SO Tool)")]
-public class Equippable : Pickupable, IInteractable
+public class Equippable : Pickupable
 {
-    public ToolDefinition tool; 
+    public ToolDefinition tool;
 
-    public string GetPrompt(PlayerInteractor interactor)
+    // === New bits ===
+    protected override void AfterPickup(PlayerInteractor interactor)
     {
-        var eq = interactor ? interactor.GetComponent<PlayerEquipment>() : null;
-        if (!tool) return "Equip";
-        if (eq && eq.HasTool(tool)) return $"Unequip {tool.displayName}";
-        return $"Equip {tool.displayName}";
-    }
-
-    public bool CanInteract(PlayerInteractor interactor) => tool != null;
-
-    public void Interact(PlayerInteractor interactor)
-    {
-        if (!tool) return;
-        var eq = interactor ? interactor.GetComponent<PlayerEquipment>() : null;
+        if (!tool || !interactor) return;
+        var eq = interactor.GetComponent<PlayerEquipment>();
         if (!eq) return;
 
+        // Avoid double-equip if already equipped
+        if (!eq.HasTool(tool)) eq.Equip(tool);
+    }
+
+    protected override void AfterDrop(PlayerInteractor interactor)
+    {
+        if (!tool || !interactor) return;
+        var eq = interactor.GetComponent<PlayerEquipment>();
+        if (!eq) return;
+
+        // Only unequip if this tool is currently equipped
         if (eq.HasTool(tool)) eq.Unequip();
-        else eq.Equip(tool);
     }
 }

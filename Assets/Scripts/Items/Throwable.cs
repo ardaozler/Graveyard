@@ -18,10 +18,6 @@ public class Throwable : MonoBehaviour
 
     public void Throw(Vector3 direction)
     {
-        // Drop first so physics applies
-        _pickupable.Drop();
-
-        // Add force after dropping
         Vector3 dir = direction.normalized;
         dir += Vector3.up * throwUpwardBias;
         _rb.AddForce(dir.normalized * throwForce, ForceMode.VelocityChange);

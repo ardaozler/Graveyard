@@ -1,19 +1,21 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using UnityEngine.Serialization;
 
-[AddComponentMenu("Interaction/GroundInteractable (SO Requirements)")]
-public class GroundInteractable : MonoBehaviour, IInteractable
+public class InteractableWithRequierement : MonoBehaviour, IInteractable
 {
     [Header("Requirements (all must pass)")]
     public InteractionRequirement[] requirements;
 
-    [Header("Events")]
-    public UnityEvent onDig;
+    [FormerlySerializedAs("onDig")] [Header("Events")]
+    public UnityEvent onSuccess;
+
+    public string prompt = "Interact";
 
     public string GetPrompt(PlayerInteractor interactor)
     {
-        if (CanInteract(interactor)) return "Dig";
+        if (CanInteract(interactor)) return prompt;
         // Show the first failing reason (optional)
         var reason = requirements?.FirstOrDefault(r => r && !r.IsSatisfied(interactor))?.GetBlockedReason(interactor);
         return string.IsNullOrEmpty(reason) ? "Unavailable" : reason;
@@ -27,12 +29,13 @@ public class GroundInteractable : MonoBehaviour, IInteractable
             if (r == null) continue;
             if (!r.IsSatisfied(interactor)) return false;
         }
+
         return true;
     }
 
     public void Interact(PlayerInteractor interactor)
     {
         if (!CanInteract(interactor)) return;
-        onDig?.Invoke();
+        onSuccess?.Invoke();
     }
 }

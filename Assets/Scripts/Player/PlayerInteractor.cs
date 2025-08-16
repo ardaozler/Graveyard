@@ -42,10 +42,8 @@ public class PlayerInteractor : MonoBehaviour
                 _lookInteractable.Interact(this);
             }
 
-            if (_held == null)
-            {
-                TryPickup();
-            }
+            // Try pickup
+            TryPickup();
         }
         else if (Input.GetKeyDown(dropKey))
         {
@@ -61,12 +59,16 @@ public class PlayerInteractor : MonoBehaviour
             if (throwable != null)
             {
                 Vector3 dir = _cam ? _cam.transform.forward : transform.forward;
+                throwable.GetComponent<Pickupable>().Drop(this);
                 throwable.Throw(dir);
                 _held = null;
             }
         }
     }
 
+    /// <summary>
+    /// Tries to pick up the object in front of the player. If has a held object, it will drop it first.
+    /// </summary>
     void TryPickup()
     {
         if (!_cam) return;
@@ -77,7 +79,8 @@ public class PlayerInteractor : MonoBehaviour
             {
                 if (pickup != null)
                 {
-                    pickup.Pickup(holdPoint);
+                    DropHeld();
+                    pickup.Pickup(holdPoint, this);
                     _held = pickup;
                 }
             }
@@ -87,7 +90,7 @@ public class PlayerInteractor : MonoBehaviour
     void DropHeld()
     {
         if (_held == null) return;
-        _held.Drop();
+        _held.Drop(this);
         _held = null;
     }
 
@@ -99,11 +102,9 @@ public class PlayerInteractor : MonoBehaviour
         if (_cam && Physics.Raycast(_cam.transform.position, _cam.transform.forward, out RaycastHit hit,
                 interactDistance, interactMask))
         {
-            // Find interactable
             _lookInteractable = hit.collider.GetComponentInParent<IInteractable>();
 
-            // Highlight if not held
-            if (!_held)
+            if (!_held || hit.collider.gameObject != _held.gameObject) 
             {
                 targetHighlight = hit.collider.GetComponentInParent<Highlightable>();
             }
