@@ -7,6 +7,7 @@ public class Pickupable : MonoBehaviour
 
     [Tooltip("Optional positional/rotational offset when snapped to the hold point.")]
     public Vector3 localPositionOffset;
+
     public Vector3 localEulerOffset;
 
     [Tooltip("If true, we'll zero velocity and set the rigidbody to kinematic when picked up.")]
@@ -20,6 +21,8 @@ public class Pickupable : MonoBehaviour
     bool _prevKinematic;
     bool _prevUseGravity;
 
+    private Collider[] _colliders;
+
     void Awake() => _rb = GetComponent<Rigidbody>();
 
     public bool IsHeld => _isHeld;
@@ -30,15 +33,22 @@ public class Pickupable : MonoBehaviour
         if (_isHeld) return;
         _isHeld = true;
 
+        _colliders = transform.GetComponentsInChildren<Collider>();
+
         _prevKinematic = _rb.isKinematic;
         _prevUseGravity = _rb.useGravity;
 
         if (makeKinematicOnPickup)
         {
+            _rb.linearVelocity = Vector3.zero; // use velocity/angularVelocity
+            _rb.angularVelocity = Vector3.zero;
             _rb.isKinematic = true;
             _rb.useGravity = false;
-            _rb.linearVelocity = Vector3.zero;         // use velocity/angularVelocity
-            _rb.angularVelocity = Vector3.zero;
+        }
+
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = false;
         }
 
         var target = defaultHoldPoint != null ? defaultHoldPoint : holdPoint;
@@ -62,9 +72,19 @@ public class Pickupable : MonoBehaviour
             _rb.useGravity = _prevUseGravity;
         }
 
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = true;
+        }
+
         AfterDrop(interactor);
     }
 
-    protected virtual void AfterPickup(PlayerInteractor interactor) { }
-    protected virtual void AfterDrop(PlayerInteractor interactor) { }
+    protected virtual void AfterPickup(PlayerInteractor interactor)
+    {
+    }
+
+    protected virtual void AfterDrop(PlayerInteractor interactor)
+    {
+    }
 }
