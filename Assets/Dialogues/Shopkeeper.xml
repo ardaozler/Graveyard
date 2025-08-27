@@ -1,0 +1,47 @@
+<Dialogue id="shopkeeper" entry="start">
+<Variables>
+<Var name="rep" type="int" default="0"/>
+<Var name="questBandits" type="string" default="NotStarted"/>
+<Var name="hasDiscount" type="bool" default="false"/>
+</Variables>
+
+
+<Nodes>
+<!-- 1) A simple line, then we go to the hub choice -->
+<Line id="start" speaker="Shopkeeper" text="Hello, traveler." next="hub"/>
+
+
+<!-- 2) Hub choice. Each option can be gated by a simple 'require'. -->
+<Choice id="hub" text="What do you need?">
+<Option text="Buy (end chat)" next="end" />
+
+
+<!-- Visible only if rep >= 5 -->
+<Option text="Any rumors?" require="rep >= 5" next="rumors"/>
+
+
+<!-- Shows only if quest accepted AND you haven't taken the reward (hasDiscount == false) -->
+<Option text="About that reward…" require="questBandits == 'Accepted'" next="grant">
+<Effects>
+<Effect set="hasDiscount" value="true"/>
+<Effect add="rep" value="2"/>
+</Effects>
+</Option>
+
+
+<Option text="Goodbye" next="end"/>
+</Choice>
+
+
+<!-- 3) A rumor line that loops back to the hub (so you can pick again) -->
+<Line id="rumors" speaker="Shopkeeper" text="Bandits moved east past the mill." next="hub"/>
+
+
+<!-- 4) After taking reward, the Effects already applied. We just end. -->
+<Line id="grant" speaker="Shopkeeper" text="You earned it. Prices are better now." next="end"/>
+
+
+<!-- 5) End stops the conversation. -->
+<End id="end"/>
+</Nodes>
+</Dialogue>
